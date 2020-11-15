@@ -19,7 +19,7 @@ const userBusiness = {
 
     return transactionSequelize(readOnlyCommitted, async (transaction) => {
 
-      const user = await User.create({ email, password }, { transaction });
+      const user = await User.create({ name, email, password }, { transaction });
       const contact = await Contact.create({ name, idUser: user.idUser }, { transaction });
       await Phone.create({ name: cellphone, idContact: contact.idContact }, { transaction });
       user.idContact = contact.idContact;
