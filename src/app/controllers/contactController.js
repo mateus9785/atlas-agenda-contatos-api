@@ -15,6 +15,7 @@ const contactController = {
       limit: Joi.number().integer().min(1).max(100),
       offset: Joi.number().integer().min(0),
       search: Joi.string().allow(""),
+      idGroup: Joi.number().integer().allow(""),
     });
 
     await controller(req, res, schema, contactBusiness.findAllPaginate)

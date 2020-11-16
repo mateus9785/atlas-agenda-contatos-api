@@ -2,6 +2,7 @@ const { User, Contact, Phone } = require('../models');
 
 const result = require('../../helper/result');
 const { transactionSequelize } = require('../../helper/methodStructure');
+const { objectOnlyAllowedFields } = require('../../helper/objectFunction');
 const sendEmailExpireToken = require('../../helper/sendEmailExpireToken');
 
 const apiUrl = process.env.API_URL;
@@ -19,15 +20,19 @@ const userBusiness = {
 
     return transactionSequelize(readOnlyCommitted, async (transaction) => {
 
-      const user = await User.create({ name, email, password }, { transaction });
-      const contact = await Contact.create({ name, idUser: user.idUser }, { transaction });
+      const user = await User.create({ email, password }, { transaction });
+      const contact = await Contact.create({ 
+        name, idUser: user.idUser, isUserContact: true 
+      }, { transaction });
       await Phone.create({ name: cellphone, idContact: contact.idContact }, { transaction });
       user.idContact = contact.idContact;
       await user.save({ transaction });
 
       await sendEmailExpireToken(email, subject, text, urlBase);
 
-      return result(user, 'Usuário cadastrado com sucesso', 200);
+      const data = objectOnlyAllowedFields(user, ["idUser", "email"]);
+
+      return result(data, 'Usuário cadastrado com sucesso', 200);
     });
   },
 };

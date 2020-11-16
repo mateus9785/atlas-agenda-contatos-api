@@ -24,11 +24,13 @@ const authBusiness = {
     if (!user.emailChecked)
       return result({ emailChecked: false }, 'Não foi feita verificação por email dessa usuário, verifique!', 404);
 
-    const token = jwt.sign({ idUser: user.idUser, name: user.name }, secret, { expiresIn: 86400 });
+    const contact = await Contact.findOne({ idUser: user.idUser, isUserContact: true });
+
+    const token = jwt.sign({ idUser: user.idUser, name: contact.name }, secret, { expiresIn: 86400 });
 
     const data = {
       token,
-      name: user.name,
+      name: contact.name,
       idUser: user.idUser,
     };
 

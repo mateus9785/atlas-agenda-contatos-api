@@ -3,6 +3,7 @@ const { Group, ContactGroup, Sequelize } = require('../models');
 const result = require('../../helper/result');
 const { updateFieldsChanges } = require("../../helper/objectFunction");
 const { verifyNullEmptyUndefined } = require("../../helper/validation");
+const { objectOnlyAllowedFields } = require('../../helper/objectFunction');
 
 const { Op } = Sequelize;
 
@@ -72,7 +73,9 @@ const groupBusiness = {
 
     const group = await Group.create({ name, idUser });
 
-    return result(group, 'Grupo cadastrado com sucesso', 200);
+    const data = objectOnlyAllowedFields(group, ["idGroup", "name", "idUser"]);
+
+    return result(data, 'Grupo cadastrado com sucesso', 200);
   },
   async put({ idGroup, name, authenticatedUser }) {
     const { idUser } = authenticatedUser;
@@ -85,7 +88,9 @@ const groupBusiness = {
 
     await group.save();
 
-    return result(group, 'Grupo alterado com sucesso', 201);
+    const data = objectOnlyAllowedFields(group, ["idGroup", "name", "idUser"]);
+
+    return result(data, 'Grupo alterado com sucesso', 201);
   },
   async delete({ idGroup, authenticatedUser }) {
     const { idUser } = authenticatedUser;

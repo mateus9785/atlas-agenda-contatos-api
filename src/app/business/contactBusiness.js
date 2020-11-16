@@ -4,6 +4,7 @@ const result = require('../../helper/result');
 const { updateFieldsChanges } = require("../../helper/objectFunction");
 const { transactionSequelize } = require('../../helper/methodStructure');
 const { verifyNullEmptyUndefined } = require("../../helper/validation");
+const { objectOnlyAllowedFields } = require('../../helper/objectFunction');
 
 const readOnlyCommitted = true;
 const { Op } = Sequelize;
@@ -22,7 +23,7 @@ const contactBusiness = {
 
     return result(contacts, null, 200);
   },
-  async findAllPaginate({ limit, offset, search, authenticatedUser }) {
+  async findAllPaginate({ limit, offset, search, idGroup, authenticatedUser }) {
     const { idUser } = authenticatedUser;
     limit = parseInt(limit, {}) || 10;
     offset = parseInt(offset, {}) || 0;
@@ -31,8 +32,20 @@ const contactBusiness = {
     if (!verifyNullEmptyUndefined(search))
       where.name = { [Op.regexp]: `.*${search}.*` }
 
+    if (idGroup) {
+      const contactsGroup = await ContactGroup.findAll({
+        where: { idGroup },
+        attributes: ["idGroup", "idContact"]
+      });
+      const idContacts = contactsGroup.map(contactGroup => contactGroup.idContact);
+      if (idContacts.length)
+        where.idContact = { [Op.in]: idContacts }
+      else  
+        return result([], null, 200, { limit, offset, total: 0 });
+    }
+
     const contacts = await Contact.findAndCountAll({
-      attributes: ["idContact", "name", "idUser"],
+      attributes: ["idContact", "name", "idUser", "isUserContact"],
       where,
       limit,
       offset: offset * limit,
@@ -54,7 +67,7 @@ const contactBusiness = {
     const { idUser } = authenticatedUser;
     const contact = await Contact.findOne({
       where: { idContact, idUser },
-      attributes: ["idContact", "name", "idUser"],
+      attributes: ["idContact", "name", "idUser", "isUserContact"],
       include: [
         {
           model: Address,
@@ -101,7 +114,9 @@ const contactBusiness = {
       const contact = await Contact.create({ name, idUser }, { transaction });
       await createContactRelatedEntities(idUser, contact, phones, addresses, groups, groupsInDatabase, transaction);
 
-      return result(contact, 'Contato cadastrado com sucesso', 200);
+      const data = objectOnlyAllowedFields(contact, ["idContact", "name", "idUser", "isUserContact"]);
+
+      return result(data, 'Contato cadastrado com sucesso', 200);
     });
   },
   async put({ idContact, name, addresses, phones, groups, authenticatedUser }) {
@@ -127,7 +142,9 @@ const contactBusiness = {
       await deleteContactRelatedEntities(idContact, transaction);
       await createContactRelatedEntities(idUser, contact, phones, addresses, groups, groupsInDatabase, transaction);
 
-      return result(contact, 'Contato alterado com sucesso', 201);
+      const data = objectOnlyAllowedFields(contact, ["idContact", "name", "idUser", "isUserContact"]);
+
+      return result(data, 'Contato alterado com sucesso', 201);
     });
   },
   async delete({ idContact, authenticatedUser }) {

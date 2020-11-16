@@ -11,6 +11,11 @@ module.exports = {
         type: Sequelize.STRING(100),
         allowNull: false,
       },
+      isUserContact: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       idUser: {
         type: Sequelize.INTEGER,
         allowNull: false,
