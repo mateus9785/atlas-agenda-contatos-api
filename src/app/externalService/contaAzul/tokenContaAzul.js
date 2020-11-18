@@ -1,7 +1,7 @@
 const axios = require("axios");
 const { generateHeaderBasic } = require("../../../helper/generateHeader");
 
-const redirect_uri = process.env.redirect_uri
+const redirect_uri = process.env.REDIRECT_URI;
 
 const tokenContaAzul = {
     async createToken(code) {

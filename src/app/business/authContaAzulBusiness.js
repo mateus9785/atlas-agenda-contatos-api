@@ -2,7 +2,7 @@ const { User } = require('../models');
 const result = require("../../helper/result");
 const tokenContaAzul = require("../externalService/contaAzul/tokenContaAzul");
 
-const contaAzulBusiness = {
+const authContaAzulBusiness = {
   async authorize({ code, state }) {
 
     const data = await tokenContaAzul.createToken(code);
@@ -24,8 +24,8 @@ const contaAzulBusiness = {
 };
 
 function addSecondsInDate(date, seconds){
-  const totalSeconds = date.setSeconds(t.getSeconds() + seconds)
+  const totalSeconds = date.setSeconds(date.getSeconds() + seconds)
   return new Date(totalSeconds);
 }
 
-module.exports = contaAzulBusiness;
+module.exports = authContaAzulBusiness;

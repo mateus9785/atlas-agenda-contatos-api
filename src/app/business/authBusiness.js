@@ -34,9 +34,10 @@ const authBusiness = {
       token,
       name: contact.name,
       idUser: user.idUser,
-      stage: user.stage,
+      state: user.state,
       client_id,
       redirect_uri,
+      contaAzulAuthenticated: user.accessToken ? true : false,
     };
 
     return result(data, null, 200);

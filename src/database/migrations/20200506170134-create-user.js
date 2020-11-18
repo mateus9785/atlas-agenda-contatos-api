@@ -21,7 +21,7 @@ module.exports = {
         allowNull: false,
         defaultValue: false,
       },
-      stage: {
+      state: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,

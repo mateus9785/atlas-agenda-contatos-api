@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: false,
     },
-    stage: {
+    state: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
