@@ -29,8 +29,22 @@ const contactController = {
   },
   async post(req, res) {
 
+    var nameFile = "", path = "";
+    if (req.file){
+      nameFile = req.file.filename;
+      path = req.file.path;
+    }
+
+    const { addresses, phones, groups } = req.body;
+
+    req.body.addresses = addresses.length ? addresses.map(address => JSON.parse(address)) : [];
+    req.body.phones = phones.length ? phones.map(phone => JSON.parse(phone)) : [];
+    req.body.groups = groups.length ? groups.map(group => JSON.parse(group)): [];
+
     const schema = Joi.object().keys({
       name: Joi.string().required(),
+      nameFile: Joi.string().allow(""),
+      path: Joi.string().allow(""),
       addresses: Joi.array().items(
         Joi.object({
           street: Joi.string().required(),
@@ -54,12 +68,27 @@ const contactController = {
       ),
     });
 
-    await controller(req, res, schema, contactBusiness.post)
+    await controller(req, res, schema, contactBusiness.post, { nameFile, path })
   },
   async put(req, res) {
+    var nameFile = "", path = "";
+    if (req.file){
+      nameFile = req.file.filename;
+      path = req.file.path;
+    }
+
+    const { addresses, phones, groups } = req.body;
+
+    req.body.addresses = addresses.length ? addresses.map(address => JSON.parse(address)) : [];
+    req.body.phones = phones.length ? phones.map(phone => JSON.parse(phone)) : [];
+    req.body.groups = groups.length ? groups.map(group => JSON.parse(group)): [];
+
     const schema = Joi.object().keys({
       idContact: Joi.number().integer(),
       name: Joi.string(),
+      nameFile: Joi.string().allow(""),
+      path: Joi.string().allow(""),
+      deletedImage: Joi.boolean().required(),
       addresses: Joi.array().items(
         Joi.object({
           street: Joi.string().required(),
@@ -83,7 +112,7 @@ const contactController = {
       ),
     });
 
-    await controller(req, res, schema, contactBusiness.put)
+    await controller(req, res, schema, contactBusiness.put, { nameFile, path })
   },
   async delete(req, res) {
     const schema = Joi.object().keys({

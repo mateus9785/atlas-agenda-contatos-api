@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+
 const { User, Contact, Phone } = require('../models');
 
 const result = require('../../helper/result');
@@ -9,6 +11,7 @@ const apiUrl = process.env.API_URL;
 
 const userBusiness = {
   async post({ name, email, cellphone, password }) {
+    const stage = crypto.randomBytes(20).toString('hex');
     const readOnlyCommitted = true;
     const subject = "Verificação de Cadastro"
     const text = "Acesse o link a seguir para ativar sua conta "
@@ -20,7 +23,8 @@ const userBusiness = {
 
     return transactionSequelize(readOnlyCommitted, async (transaction) => {
 
-      const user = await User.create({ email, password }, { transaction });
+      const user = await User.create({ email, password, stage }, { transaction });
+
       const contact = await Contact.create({ 
         name, idUser: user.idUser, isUserContact: true 
       }, { transaction });

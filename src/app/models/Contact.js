@@ -15,6 +15,16 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: false,
     },
+    nameFile: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    urlContactImage: {
+      type: DataTypes.VIRTUAL,
+      get: function () {
+        return process.env.API_URL + '/image/contact/' + this.nameFile;
+      }
+    },
   });
 
   Contact.associate = models => {
@@ -28,11 +38,11 @@ module.exports = (sequelize, DataTypes) => {
     });
     Contact.hasMany(models.Address, {
       foreignKey: 'idContact',
-      allowNull: false,
+      allowNull: true,
     });
     Contact.hasMany(models.ContactGroup, {
       foreignKey: 'idContact',
-      allowNull: false,
+      allowNull: true,
     });
   };
 

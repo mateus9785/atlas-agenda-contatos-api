@@ -21,6 +21,23 @@ module.exports = {
         allowNull: false,
         defaultValue: false,
       },
+      stage: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      accessToken: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },      
+      refreshToken: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      expiresIn: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

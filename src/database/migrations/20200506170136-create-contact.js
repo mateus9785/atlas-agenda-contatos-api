@@ -16,6 +16,10 @@ module.exports = {
         allowNull: false,
         defaultValue: false,
       },
+      nameFile: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
       idUser: {
         type: Sequelize.INTEGER,
         allowNull: false,

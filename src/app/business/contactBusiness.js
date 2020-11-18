@@ -5,6 +5,8 @@ const { updateFieldsChanges } = require("../../helper/objectFunction");
 const { transactionSequelize } = require('../../helper/methodStructure');
 const { verifyNullEmptyUndefined } = require("../../helper/validation");
 const { objectOnlyAllowedFields } = require('../../helper/objectFunction');
+const { resizeImageInPath } = require('../../helper/createFilePath');
+const sizeImage = { width: 842, quality: 70 };
 
 const readOnlyCommitted = true;
 const { Op } = Sequelize;
@@ -45,7 +47,7 @@ const contactBusiness = {
     }
 
     const contacts = await Contact.findAndCountAll({
-      attributes: ["idContact", "name", "idUser", "isUserContact"],
+      attributes: ["idContact", "name", "idUser", "isUserContact", "urlContactImage", "nameFile"],
       where,
       limit,
       offset: offset * limit,
@@ -67,7 +69,7 @@ const contactBusiness = {
     const { idUser } = authenticatedUser;
     const contact = await Contact.findOne({
       where: { idContact, idUser },
-      attributes: ["idContact", "name", "idUser", "isUserContact"],
+      attributes: ["idContact", "name", "idUser", "isUserContact", "urlContactImage", "nameFile"],
       include: [
         {
           model: Address,
@@ -98,7 +100,7 @@ const contactBusiness = {
 
     return result(contact, null, 200);
   },
-  async post({ name, addresses, phones, groups, authenticatedUser }) {
+  async post({ name, addresses, phones, groups, nameFile, path, authenticatedUser }) {
     const { idUser } = authenticatedUser;
     const groupsInDatabase = await Group.findAll({
       where: {
@@ -111,7 +113,10 @@ const contactBusiness = {
 
     return transactionSequelize(readOnlyCommitted, async (transaction) => {
 
-      const contact = await Contact.create({ name, idUser }, { transaction });
+      if(nameFile && path)
+        await resizeImageInPath(path, sizeImage.width, sizeImage.width);
+
+      const contact = await Contact.create({ name, idUser, nameFile }, { transaction });
       await createContactRelatedEntities(idUser, contact, phones, addresses, groups, groupsInDatabase, transaction);
 
       const data = objectOnlyAllowedFields(contact, ["idContact", "name", "idUser", "isUserContact"]);
@@ -119,7 +124,7 @@ const contactBusiness = {
       return result(data, 'Contato cadastrado com sucesso', 200);
     });
   },
-  async put({ idContact, name, addresses, phones, groups, authenticatedUser }) {
+  async put({ idContact, name, addresses, phones, groups, nameFile, path, authenticatedUser }) {
     const { idUser } = authenticatedUser;
     var contact = await Contact.findOne({ where: { idContact, idUser } });
     const groupsInDatabase = await Group.findAll({
@@ -134,10 +139,13 @@ const contactBusiness = {
     if (!contact)
       return result(null, 'Contato não encontrado', 404);
 
-    contact = updateFieldsChanges(contact, { name });
+    contact = updateFieldsChanges(contact, { name, nameFile });
 
     return transactionSequelize(readOnlyCommitted, async (transaction) => {
 
+      if(nameFile && path)
+        await resizeImageInPath(path, sizeImage.width, sizeImage.width);
+      
       await contact.save({ transaction });
       await deleteContactRelatedEntities(idContact, transaction);
       await createContactRelatedEntities(idUser, contact, phones, addresses, groups, groupsInDatabase, transaction);

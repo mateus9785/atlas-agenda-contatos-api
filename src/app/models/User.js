@@ -22,6 +22,23 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: false,
     },
+    stage: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    accessToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },      
+    refreshToken: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    expiresIn: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
   });
 
   User.beforeSave(async user => {

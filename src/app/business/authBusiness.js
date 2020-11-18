@@ -9,6 +9,8 @@ const result = require("../../helper/result");
 const secret = process.env.AUTH_SECRET
 const apiUrl = process.env.API_URL;
 const baseUrl = process.env.BASE_URL;
+const client_id = process.env.CLIENT_ID;
+const redirect_uri = process.env.REDIRECT_URI;
 
 const authBusiness = {
   async authenticate({ email, password }) {
@@ -32,6 +34,9 @@ const authBusiness = {
       token,
       name: contact.name,
       idUser: user.idUser,
+      stage: user.stage,
+      client_id,
+      redirect_uri,
     };
 
     return result(data, null, 200);
