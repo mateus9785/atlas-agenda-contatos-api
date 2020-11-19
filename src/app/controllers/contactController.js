@@ -37,9 +37,9 @@ const contactController = {
 
     const { addresses, phones, groups } = req.body;
 
-    req.body.addresses = addresses.length ? addresses.map(address => JSON.parse(address)) : [];
-    req.body.phones = phones.length ? phones.map(phone => JSON.parse(phone)) : [];
-    req.body.groups = groups.length ? groups.map(group => JSON.parse(group)): [];
+    req.body.addresses = addresses && addresses.length ? addresses.map(address => JSON.parse(address)) : [];
+    req.body.phones = phones && phones.length ? phones.map(phone => JSON.parse(phone)) : [];
+    req.body.groups = groups && groups.length ? groups.map(group => JSON.parse(group)): [];
 
     const schema = Joi.object().keys({
       name: Joi.string().required(),

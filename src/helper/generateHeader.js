@@ -4,7 +4,7 @@ const client_secret = process.env.CLIENT_SECRET;
 
 const generateHeader = {
     generateHeaderBasic(){
-        return 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64'))
+        return 'Basic ' + (Buffer.from(client_id + ':' + client_secret).toString('base64'))
     },
     generateHeaderBearer(token){
         return 'Bearer ' + token;
